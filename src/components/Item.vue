@@ -48,6 +48,7 @@
     .title {
         width:100%;
         font-size: 18px;
+        font-weight: bold;
         border: 0;
         outline: 0;
         background: transparent;
@@ -58,6 +59,7 @@
         resize: none;
         border: 0;
         outline: 0;
+        font-size: 14px;
     }
     .btn-custom {
         background-color: #505050;
