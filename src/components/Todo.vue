@@ -8,7 +8,7 @@
                         <div class="form-group">
                             <input type="text" v-model="input" id="todoitem" placeholder="What needs to be done?" maxlength="30"/>
                         </div>
-                        <button type="button" data-toggle="modal" data-target="#itemModal" class="btn btn-add">Add</button>
+                        <button type="button" v-on:click="addNewItem()" class="btn btn-add">Add</button>
                     </form>
                 </div>
             </div>
@@ -22,7 +22,7 @@
                     <li v-for="(todo, index) in todos" :key="index" class="list-group-item">
                         <div>
                             <input class="itemComplete" type="checkbox" v-model="todo.isComplete" v-on:change="updateItem(todo)"> 
-                            <label class="itemTitle strikethrough">{{ todo.title }}</label>
+                            <label class="itemTitle strikethrough" v-on:click="editValues(todo)">{{ todo.title }}</label>
                             <i class="itemCreated">{{ formatDate(todo.created) }}</i>
                             <button class="btn-trash" v-on:click="deleteItem(todo.id, index)">
                                 <span class="glyphicon glyphicon-trash"></span>
@@ -32,7 +32,7 @@
                 </ul>
             </div>
         </div>
-        <Item :titleProp="input" v-on:sendToSave="addItem"/>
+        <Item :todoItemProp="todoCurrentItem" v-on:sendToSave="saveItem"/>
     </div>
 </template>
 
@@ -48,6 +48,7 @@
         data () {
             return {
                 todos: [],
+                todoCurrentItem: Object,
                 input: "",
                 loading: false
             }
@@ -62,10 +63,18 @@
             });
         },
         methods: {
-            addItem(itemToSave) {
+            saveItem(itemToSave) {
+                if(itemToSave.id == undefined)
+                    this.addItem(itemToSave);
+                else
+                    this.updateItem(itemToSave);
+
+                this.todoCurrentItem = {};
+            },
+            addItem(itemToAdd) {
                 this.loading = true;
                 axios
-                .post('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo', itemToSave)
+                .post('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo', itemToAdd)
                 .then(response => {
                     this.todos.push(response.data); 
                     this.input = "";
@@ -91,6 +100,14 @@
             }, formatDate(date) {
                 var newDate = new Date(date);
                 return newDate.toLocaleString(newDate, { month: "short" }) + ' ' +newDate.getDate();
+            },
+            addNewItem() {
+                this.todoCurrentItem = { "title": this.input }
+                $('#itemModal').modal('show');
+            },
+            editValues(itemToEdit) {
+                this.todoCurrentItem = itemToEdit;
+                $('#itemModal').modal('show');
             }
         }
     }
@@ -118,6 +135,7 @@
         background-color: #505050;
         color:white;
         font-weight: bold;
+        outline: 0;
     }
     .btn-add:hover {
         color:white;
@@ -152,7 +170,11 @@
     .itemTitle {
         padding-left: 8px;
         font-size:15px;
-        float:left;
+        float:left;        
+    }
+    .itemTitle:hover {
+        cursor: pointer;
+        text-decoration: underline;
     }
     .itemCreated {
         padding-left: 8px;
@@ -162,6 +184,7 @@
     }
     .btn-trash{
         border:0px solid transparent;
+        outline: 0;
         font-size:18px;
         float: right;
     }

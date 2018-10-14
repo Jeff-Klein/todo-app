@@ -4,10 +4,10 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal">&times;</button>
-          <input class="title" v-model="titlePropLocal" id="title"/>
+          <input class="title" v-model="todoItemProp.title" id="title"/>
         </div>
         <div class="modal-body">
-          <textarea v-model="description" id="description" placeholder="Description" maxlength="200"/>
+          <textarea v-model="todoItemProp.description" id="description" placeholder="Description" maxlength="200"/>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-custom" data-dismiss="modal" v-on:click="sendToSave">Save</button>
@@ -22,22 +22,20 @@
     export default {
         name: "Item",
         props: {
-            titleProp: String
+            todoItemProp: {}
         },
         data () {
             return {
-                description: ""
             }
         },
         computed: {
-            titlePropLocal: function(){
-                return this.titleProp;
+            todoItemPropLocal: function(){
+                return this.todoItemProp;
             }
         },
         methods: {
             sendToSave (event) {
-                var returnValue = { "title": title._value, "description": description._value };
-                this.$emit('sendToSave', returnValue)
+                this.$emit('sendToSave', this.todoItemPropLocal);
             }
         }
     }
