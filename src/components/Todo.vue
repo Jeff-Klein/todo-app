@@ -8,7 +8,7 @@
                         <div class="form-group">
                             <input type="text" v-model="input" id="todoitem" placeholder="What needs to be done?" maxlength="30"/>
                         </div>
-                        <button type="button" v-on:click="addItem()" class="btn btn-add">Add</button>
+                        <button type="button" data-toggle="modal" data-target="#itemModal" class="btn btn-add">Add</button>
                     </form>
                 </div>
             </div>
@@ -20,25 +20,31 @@
             <div class="col-md-12">
                 <ul class="list-group">
                     <li v-for="(todo, index) in todos" :key="index" class="list-group-item">
-                        <input class="itemComplete" type="checkbox" v-model="todo.isComplete" v-on:change="updateItem(todo)"> 
-                        <span class="itemTitle">{{ todo.title }}
+                        <div>
+                            <input class="itemComplete" type="checkbox" v-model="todo.isComplete" v-on:change="updateItem(todo)"> 
+                            <label class="itemTitle strikethrough">{{ todo.title }}</label>
                             <i class="itemCreated">{{ formatDate(todo.created) }}</i>
-                        </span>
-                        <button class="btn-trash" v-on:click="deleteItem(todo.id, index)">
-                            <span class="glyphicon glyphicon-trash"></span>
-                        </button>
+                            <button class="btn-trash" v-on:click="deleteItem(todo.id, index)">
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                        </div>
                     </li>
                 </ul>
             </div>
         </div>
+        <Item :titleProp="input" v-on:sendToSave="addItem"/>
     </div>
 </template>
 
 <script>
   import axios from 'axios';
+  import Item from './Item';
 
     export default {
         name: "Todo",
+        components :{
+            Item
+        },
         data () {
             return {
                 todos: [],
@@ -56,11 +62,10 @@
             });
         },
         methods: {
-            addItem() {
-                var newItem = {"title": this.input};
+            addItem(itemToSave) {
                 this.loading = true;
                 axios
-                .post('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo', newItem)
+                .post('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo', itemToSave)
                 .then(response => {
                     this.todos.push(response.data); 
                     this.input = "";
@@ -146,11 +151,14 @@
     }
     .itemTitle {
         padding-left: 8px;
-        font-size:16px;
+        font-size:15px;
         float:left;
     }
     .itemCreated {
+        padding-left: 8px;
+        line-height: 22px;
         font-size: 12px;
+        float:left;
     }
     .btn-trash{
         border:0px solid transparent;
@@ -162,5 +170,8 @@
     }
     .loader {
         padding-top: 5%;
+    }
+    input[type=checkbox]:checked + label.strikethrough{
+        text-decoration: line-through;
     }
 </style>
