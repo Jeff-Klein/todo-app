@@ -56,19 +56,15 @@
         mounted () {
             this.loading = true;
             axios
-            .get('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/actives')
+            .get('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/actives', 
+            { withCredentials: true })
             .then(response => {
                 this.todos = response.data;
                 this.loading = false;
+            })
+            .catch(error => {
+                alert(error.message);
             });
-        },
-        addNewItem() {
-            this.todoCurrentItem = { "title": this.input }
-            $('#itemModal').modal('show');
-        },
-        editValues(itemToEdit) {
-            this.todoCurrentItem = itemToEdit;
-            $('#itemModal').modal('show');
         },
         methods: {
             saveItem(itemToSave) {
@@ -79,31 +75,51 @@
 
                 this.todoCurrentItem = {};
             },
+            addNewItem() {
+                this.todoCurrentItem = { "title": this.input }
+                $('#itemModal').modal('show');
+            },
+            editValues(itemToEdit) {
+                this.todoCurrentItem = itemToEdit;
+                $('#itemModal').modal('show');
+            },
             addItem(itemToAdd) {
                 this.loading = true;
                 axios
-                .post('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo', itemToAdd)
+                .post('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo', itemToAdd, 
+                { withCredentials: true })
                 .then(response => {
                     this.todos.push(response.data); 
                     this.input = "";
                     this.loading = false;
+                })
+                .catch(error => {
+                    alert(error.message);
                 });
             },
             removeItem(id, index) {
                 this.loading = true;
                 axios
-                .put('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/remove/' + id)
+                .put('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/remove/' + id, {}, 
+                { withCredentials: true })
                 .then(response => {
                     this.todos.splice(index, 1);
                     this.loading = false;
+                })
+                .catch(error => {
+                    alert(error.message);
                 });
             },
             updateItem(todo) {
                 this.loading = true;
                 axios
-                .put('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/' + todo.id, todo)
+                .put('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/' + todo.id, todo, 
+                { withCredentials: true })
                 .then(response => { 
                     this.loading = false 
+                })
+                .catch(error => {
+                    alert(error.message);
                 });
             }, formatDate(date) {
                 var newDate = new Date(date);
