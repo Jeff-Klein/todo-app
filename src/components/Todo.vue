@@ -24,7 +24,7 @@
                             <input class="itemComplete" type="checkbox" v-model="todo.isComplete" v-on:change="updateItem(todo)"> 
                             <label class="itemTitle strikethrough" v-on:click="editValues(todo)">{{ todo.title }}</label>
                             <i class="itemCreated">{{ formatDate(todo.created) }}</i>
-                            <button class="btn-trash" v-on:click="deleteItem(todo.id, index)">
+                            <button class="btn-trash" v-on:click="removeItem(todo.id, index)">
                                 <span class="glyphicon glyphicon-trash"></span>
                             </button>
                         </div>
@@ -56,11 +56,19 @@
         mounted () {
             this.loading = true;
             axios
-            .get('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo')
+            .get('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/actives')
             .then(response => {
                 this.todos = response.data;
                 this.loading = false;
             });
+        },
+        addNewItem() {
+            this.todoCurrentItem = { "title": this.input }
+            $('#itemModal').modal('show');
+        },
+        editValues(itemToEdit) {
+            this.todoCurrentItem = itemToEdit;
+            $('#itemModal').modal('show');
         },
         methods: {
             saveItem(itemToSave) {
@@ -81,10 +89,10 @@
                     this.loading = false;
                 });
             },
-            deleteItem(id, index) {
+            removeItem(id, index) {
                 this.loading = true;
                 axios
-                .delete('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/' + id)
+                .put('http://todoapi.us-west-2.elasticbeanstalk.com/api/todo/remove/' + id)
                 .then(response => {
                     this.todos.splice(index, 1);
                     this.loading = false;
@@ -100,14 +108,6 @@
             }, formatDate(date) {
                 var newDate = new Date(date);
                 return newDate.toLocaleString(newDate, { month: "short" }) + ' ' +newDate.getDate();
-            },
-            addNewItem() {
-                this.todoCurrentItem = { "title": this.input }
-                $('#itemModal').modal('show');
-            },
-            editValues(itemToEdit) {
-                this.todoCurrentItem = itemToEdit;
-                $('#itemModal').modal('show');
             }
         }
     }
