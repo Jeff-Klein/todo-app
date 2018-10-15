@@ -76,6 +76,10 @@
                 this.todoCurrentItem = {};
             },
             addNewItem() {
+                if(this.input.trim() == '') {
+                    alert("Title is requeried.");
+                    return;
+                }
                 this.todoCurrentItem = { "title": this.input }
                 $('#itemModal').modal('show');
             },

@@ -10,7 +10,7 @@
           <textarea v-model="todoItemProp.description" id="description" placeholder="Description" maxlength="200"/>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-custom" data-dismiss="modal" v-on:click="sendToSave">Save</button>
+          <button type="button" class="btn btn-custom" v-on:click="sendToSave">Save</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         </div>
       </div>
@@ -35,7 +35,14 @@
         },
         methods: {
             sendToSave (event) {
-                this.$emit('sendToSave', this.todoItemPropLocal);
+                if(this.todoItemPropLocal.title.trim() == "") {
+                    alert("Title is requeried.");
+                    return;
+                }
+                else {
+                    this.$emit('sendToSave', this.todoItemPropLocal);
+                    $('#itemModal').modal('hide');
+                }
             }
         }
     }
